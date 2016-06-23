@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">PopularMovies</string>
+
+    <string name="API_KEY">5bcfaa2234e9753384005a12ae3db303</string>
+    <string name="base_url">api.themoviedb.org</string>
+    <string name="path1">3</string>
+    <string name="path2">discover</string>
+    <string name="path3">movies</string>
+    <string name="API_query">api_key</string>
+    <string name="sort_by_query">sort_by</string>
+    <string name="sort_by_query1">popularity.desc</string>
+    <string name="sort_by_query2">vote_average.desc</string>
+    <string name="sort_by_year_query">primary_release_year</string>
+    <string name="page_query">page</string>
+
+
+
 </resources>
