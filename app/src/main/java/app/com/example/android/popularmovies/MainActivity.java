@@ -4,11 +4,17 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +35,13 @@ public class MainActivity extends AppCompatActivity {
     String year;
     String choice;
     Singleton mSingleton;
-    TextView textView;
-    ImageView imageView;
+    private GridLayoutManager gridLayoutManager;
+    RecyclerViewAdapter recyclerViewAdapter;
+    Spinner spinner;
+    Button leftButton;
+    Button rightButton;
+    EditText pageNumberEditText;
+    EditText yearEditText;
 
 
     @Override
@@ -44,26 +55,111 @@ public class MainActivity extends AppCompatActivity {
         choice = popularity;
         year = "2016";
         mSingleton = Singleton.getInstance();
+        leftButton = (Button) findViewById(R.id.leftButton);
+        rightButton = (Button) findViewById(R.id.rightButton);
+        pageNumberEditText = (EditText) findViewById(R.id.pageNumberEditText);
+        yearEditText = (EditText) findViewById(R.id.yearEditText);
 
-        textView = (TextView) findViewById(R.id.textView);
-        imageView = (ImageView) findViewById(R.id.imageView);
+        spinner = (Spinner) findViewById(R.id.spinnerType);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_type, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selection = (String) parent.getItemAtPosition(position);
+                if (selection.equals("Most Popular")) {
+                    choice = getString(R.string.sort_by_query1);
+                } else {
+                    choice = getString(R.string.sort_by_query2);
+                }
+                urlBuilderAndCall();
+            }
 
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(getString(R.string.base_url))
-                .appendPath(getString(R.string.path1))
-                .appendPath(getString(R.string.path2))
-                .appendPath(getString(R.string.path3))
-                .appendQueryParameter(getString(R.string.API_query), getString(R.string.API_KEY))
-                .appendQueryParameter(getString(R.string.sort_by_query), choice)
-                .appendQueryParameter(getString(R.string.sort_by_year_query), year)
-                .appendQueryParameter(getString(R.string.page_query), pageNumber);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-        String myUrl = builder.build().toString();
-        getMoviesAsyncTask getMoviesAsyncTask = new getMoviesAsyncTask();
-        getMoviesAsyncTask.execute(myUrl);
+            }
+        });
 
+
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pageNumberTemp = pageNumberEditText.getText().toString();
+                int pageNumberInt = Integer.valueOf(pageNumberTemp);
+                if (pageNumberInt < 2) {
+                    pageNumber = "1";
+                    pageNumberEditText.setText(pageNumber);
+                } else {
+                    pageNumber = String.valueOf((pageNumberInt - 1));
+                    pageNumberEditText.setText(pageNumber);
+                }
+
+            }
+        });
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pageNumberTemp = pageNumberEditText.getText().toString();
+                int pageNumberInt = Integer.valueOf(pageNumberTemp);
+                pageNumber = String.valueOf((pageNumberInt + 1));
+                pageNumberEditText.setText(pageNumber);
+            }
+        });
+
+        yearEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (yearEditText.getText().toString().equals("")) {
+                    year = "2016";}
+                else if (Integer.valueOf(yearEditText.getText().toString()) >= 1887 && Integer.valueOf(yearEditText.getText().toString()) <= 2016) {
+                    year = yearEditText.getText().toString();
+                    urlBuilderAndCall();
+                } else {
+                    Toast.makeText(MainActivity.this, "Please enter a year between 1887 and 2016.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        pageNumberEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (pageNumberEditText.getText().toString().equals("")) {
+                    pageNumber = "1";
+                }else if (Integer.valueOf(pageNumberEditText.getText().toString()) >= 1) {
+                    pageNumber = pageNumberEditText.getText().toString();
+                }
+                urlBuilderAndCall();
+            }
+        });
+
+
+        gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerViewAdapter = new RecyclerViewAdapter(mSingleton.getMovieInfoObjectsArrayList());
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(gridLayoutManager);
     }
+
 
     public class getMoviesAsyncTask extends AsyncTask<String, Void, Void> {
 
@@ -73,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
             mSingleton.movieInfoObjectsArrayList.clear();
             try {
                 URL url = new URL(params[0]);
-                Log.d("hmm",params[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
                 InputStream inputStream = connection.getInputStream();
@@ -91,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     String originalTitle = movieData.optString("original_title");
                     String posterPath = movieData.optString("poster_path");
                     String fullPosterPath = getString(R.string.poster_url) + posterPath;
-                    if (posterPath == null) {
+                    if (posterPath.equals("null")) {
                         fullPosterPath = getString(R.string.no_poster_url);
                     }
                     String overview = movieData.optString("overview");
@@ -108,8 +203,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            textView.setText(mSingleton.movieInfoObjectsArrayList.get(1).originalTitle);
-            Picasso.with(getBaseContext()).load(mSingleton.movieInfoObjectsArrayList.get(1).posterPath).fit().into(imageView);
+            recyclerViewAdapter.notifyDataSetChanged();
         }
     }
 
@@ -123,4 +217,23 @@ public class MainActivity extends AppCompatActivity {
         reader.close();
         return builder.toString();
     }
+
+    public void urlBuilderAndCall() {
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority(getString(R.string.base_url))
+                .appendPath(getString(R.string.path1))
+                .appendPath(getString(R.string.path2))
+                .appendPath(getString(R.string.path3))
+                .appendQueryParameter(getString(R.string.API_query), getString(R.string.API_KEY))
+                .appendQueryParameter(getString(R.string.sort_by_query), choice)
+                .appendQueryParameter(getString(R.string.sort_by_year_query), year)
+                .appendQueryParameter(getString(R.string.page_query), pageNumber);
+
+        String myUrl = builder.build().toString();
+        getMoviesAsyncTask getMoviesAsyncTask = new getMoviesAsyncTask();
+        getMoviesAsyncTask.execute(myUrl);
+    }
+
+
 }

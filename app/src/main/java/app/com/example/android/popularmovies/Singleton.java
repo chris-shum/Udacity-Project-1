@@ -23,4 +23,7 @@ public class Singleton {
         return singleton;
     }
 
+    public ArrayList<MovieInfoObject> getMovieInfoObjectsArrayList() {
+        return movieInfoObjectsArrayList;
+    }
 }

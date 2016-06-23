@@ -19,5 +19,23 @@ public class MovieInfoObject {
         this.releaseDate = releaseDate;
     }
 
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
 
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public String getVoteAverage() {
+        return voteAverage;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
 }
