@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     Button leftButton;
     Button rightButton;
     EditText pageNumberEditText;
-    EditText yearEditText;
+//    EditText yearEditText;
 
 
     @Override
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         leftButton = (Button) findViewById(R.id.leftButton);
         rightButton = (Button) findViewById(R.id.rightButton);
         pageNumberEditText = (EditText) findViewById(R.id.pageNumberEditText);
-        yearEditText = (EditText) findViewById(R.id.yearEditText);
+//        yearEditText = (EditText) findViewById(R.id.yearEditText);
 
         spinner = (Spinner) findViewById(R.id.spinnerType);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -110,27 +109,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        yearEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (yearEditText.getText().toString().equals("")) {
-                    year = "2016";}
-                else if (Integer.valueOf(yearEditText.getText().toString()) >= 1887 && Integer.valueOf(yearEditText.getText().toString()) <= 2016) {
-                    year = yearEditText.getText().toString();
-                    urlBuilderAndCall();
-                } else {
-                    Toast.makeText(MainActivity.this, "Please enter a year between 1887 and 2016.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        yearEditText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (yearEditText.getText().toString().equals("")) {
+//                    year = "2016";}
+//                else if (Integer.valueOf(yearEditText.getText().toString()) >= 1887 && Integer.valueOf(yearEditText.getText().toString()) <= 2016) {
+//                    year = yearEditText.getText().toString();
+//                    urlBuilderAndCall();
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Please enter a year between 1887 and 2016.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
 
         pageNumberEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -223,11 +222,12 @@ public class MainActivity extends AppCompatActivity {
         builder.scheme("https")
                 .authority(getString(R.string.base_url))
                 .appendPath(getString(R.string.path1))
-                .appendPath(getString(R.string.path2))
+//                .appendPath(getString(R.string.path2))
                 .appendPath(getString(R.string.path3))
+                .appendPath(choice)
                 .appendQueryParameter(getString(R.string.API_query), getString(R.string.API_KEY))
-                .appendQueryParameter(getString(R.string.sort_by_query), choice)
-                .appendQueryParameter(getString(R.string.sort_by_year_query), year)
+//                .appendQueryParameter(getString(R.string.sort_by_query), choice)
+//                .appendQueryParameter(getString(R.string.sort_by_year_query), year)
                 .appendQueryParameter(getString(R.string.page_query), pageNumber);
 
         String myUrl = builder.build().toString();
