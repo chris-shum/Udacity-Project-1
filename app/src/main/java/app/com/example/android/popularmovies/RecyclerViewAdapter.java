@@ -32,7 +32,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        holder.movieTitle.setText(movieInfoObjectArrayList.get(position).getOriginalTitle());
+//        holder.movieTitle.setText(movieInfoObjectArrayList.get(position).getOriginalTitle());
         Context context = holder.moviePoster.getContext();
         Picasso.with(context).load(movieInfoObjectArrayList.get(position).getPosterPath()).into(holder.moviePoster);
     }
@@ -52,7 +52,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public RecyclerViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            movieTitle = (TextView) itemView.findViewById(R.id.movie_name);
+//            movieTitle = (TextView) itemView.findViewById(R.id.movie_name);
             moviePoster = (ImageView) itemView.findViewById(R.id.movie_poster);
 
         }
